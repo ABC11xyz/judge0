@@ -3,6 +3,7 @@ FROM judge0/compilers:1.4.0 AS base
 ENV PATH "/usr/local/ruby-2.7.0/bin:/opt/.gem/bin:$PATH"
 ENV GEM_HOME "/opt/.gem/"
 
+# Dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       cron \
@@ -12,6 +13,8 @@ RUN apt-get update && \
     echo "gem: --no-document" > /root/.gemrc && \
     gem install bundler:2.1.4 && \
     npm install -g --unsafe-perm aglio@2.3.0
+
+EXPOSE 2358
 
 WORKDIR /api
 
@@ -29,6 +32,6 @@ RUN useradd -u 1000 -m -r judge0 && \
 
 USER judge0
 
-# 👇 This is for background job or worker
+# 👇 This is the server
 ENTRYPOINT ["/api/docker-entrypoint.sh"]
-CMD ["bundle", "exec", "sidekiq"]  # Or your custom worker process
+CMD ["/api/scripts/server"]
